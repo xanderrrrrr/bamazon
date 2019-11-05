@@ -23,14 +23,63 @@ var connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
-    afterConnection();
-  });
+    runPrompt();
+});
   
-  function afterConnection() {
-    connection.query("SELECT * FROM products", function(err, res) {
-      if (err) throw err;
-      console.log(res);
-      connection.end();
-    });
+function runPrompt() {
+    inquirer
+      .prompt([
+      {
+        name: "whatID",
+        type: "input",
+        message: "What is the ID of the product that you'd like to buy? ",
+      },
+      {
+          name: "whatQuantity",
+          type: "input",
+          message: "How many units of the product would you like to buy? "
+      }
+        ])
+      .then(function(answer) {
+        var query = "SELECT stock_quantity FROM products WHERE item_id = ?";
+        connection.query(query, [answer.whatID], function(err, res) {
+            var stock_quantity = res[0].stock_quantity;
+            var new_db_quantity = stock_quantity - answer.whatQuantity
+
+            if (answer.whatQuantity <= stock_quantity) {
+                console.log("We have enough quantity, successfully ordered \n")
+                // console.log(res)
+                var query = "UPDATE products SET stock_quantity = ? WHERE item_id = ?"
+                connection.query(query, [new_db_quantity, answer.whatID], function(err, res) {
+                    console.log("Updating database...\n")
+                    console.log("We now have " + new_db_quantity + " items left")
+                }) 
+            } else {
+                console.log("We do not have enough quantity to satisfiy your order :( ")
+            }
+
+            connection.end();
+        // switch (answer.action) {
+        // case "Find songs by artist":
+        //   artistSearch();
+        //   break;
+  
+        // case "Find all artists who appear more than once":
+        //   multiSearch();
+        //   break;
+  
+        // case "Find data within a specific range":
+        //   rangeSearch();
+        //   break;
+  
+        // case "Search for a specific song":
+        //   songSearch();
+        //   break;
+  
+        // case "Find artists with a top song and top album in the same year":
+        //   songAndAlbumSearch();
+        //   break;
+        });
+      });
   }
-  
+
