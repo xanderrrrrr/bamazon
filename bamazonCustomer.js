@@ -19,21 +19,48 @@ connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     // run the prompt function
-    runPrompt();
+    initialPrompt();
 });
 
+// function that prompts users if they want to buy or exit
+function initialPrompt() {
+    inquirer
+    .prompt(
+        {
+            name: "action",
+            type: "list",
+            message: "what would you like to do?",
+            choices: [
+                "Buy an item",
+                "Exit"
+            ]
+        }
+    )
+    .then(function(actionAnswer) {
+        switch (actionAnswer.action) {
+            case "Buy an item":
+              runSearch();
+              break;
+      
+            case "Exit":
+                connection.end();
+              break;
+        }
+    });
+}
+
 // function that will prompt the user and update our db if necessary
-function runPrompt() {
+function runSearch() {
     inquirer
       .prompt([
       {
         name: "whatID",
-        type: "input",
+        type: "number",
         message: "What is the ID of the product that you'd like to buy? ",
       },
       {
           name: "whatQuantity",
-          type: "input",
+          type: "number",
           message: "How many units of the product would you like to buy? "
       }
         ])
@@ -63,13 +90,13 @@ function runPrompt() {
                     // returning to the user what we have left and what they paid
                     console.log("We now have " + new_db_quantity + " item(s) left\n")
                     console.log("you paid $" + price_math)
+                    initialPrompt();
                 }) 
             } else {
                 // if the user wants more than the db has, then we cannot fulfill it
                 console.log("We do not have enough quantity to satisfy your order :( ")
+                initialPrompt();
             }
-            // terminating the connection since we don't need to be connected anymore
-            connection.end();
         });
       });
   }
