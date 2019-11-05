@@ -41,21 +41,24 @@ function runPrompt() {
       }
         ])
       .then(function(answer) {
-        var query = "SELECT stock_quantity FROM products WHERE item_id = ?";
+        var query = "SELECT stock_quantity,price  FROM products WHERE item_id = ?";
         connection.query(query, [answer.whatID], function(err, res) {
             var stock_quantity = res[0].stock_quantity;
             var new_db_quantity = stock_quantity - answer.whatQuantity
+            
 
             if (answer.whatQuantity <= stock_quantity) {
+                // math for total cost goes here
+                var price_math = res[0].price * answer.whatQuantity
                 console.log("We have enough quantity, successfully ordered \n")
-                // console.log(res)
                 var query = "UPDATE products SET stock_quantity = ? WHERE item_id = ?"
                 connection.query(query, [new_db_quantity, answer.whatID], function(err, res) {
                     console.log("Updating database...\n")
-                    console.log("We now have " + new_db_quantity + " items left")
+                    console.log("We now have " + new_db_quantity + " item(s) left")
+                    console.log("you paid $" + price_math)
                 }) 
             } else {
-                console.log("We do not have enough quantity to satisfiy your order :( ")
+                console.log("We do not have enough quantity to satisfy your order :( ")
             }
 
             connection.end();
