@@ -50,11 +50,11 @@ function runPrompt() {
             if (answer.whatQuantity <= stock_quantity) {
                 // math for total cost goes here
                 var price_math = res[0].price * answer.whatQuantity
-                console.log("We have enough quantity, successfully ordered \n")
+                console.log("We have enough quantity! \n")
                 var query = "UPDATE products SET stock_quantity = ? WHERE item_id = ?"
                 connection.query(query, [new_db_quantity, answer.whatID], function(err, res) {
                     console.log("Updating database...\n")
-                    console.log("We now have " + new_db_quantity + " item(s) left")
+                    console.log("We now have " + new_db_quantity + " item(s) left\n")
                     console.log("you paid $" + price_math)
                 }) 
             } else {
@@ -62,27 +62,9 @@ function runPrompt() {
             }
 
             connection.end();
-        // switch (answer.action) {
-        // case "Find songs by artist":
-        //   artistSearch();
-        //   break;
-  
-        // case "Find all artists who appear more than once":
-        //   multiSearch();
-        //   break;
-  
-        // case "Find data within a specific range":
-        //   rangeSearch();
-        //   break;
-  
-        // case "Search for a specific song":
-        //   songSearch();
-        //   break;
-  
-        // case "Find artists with a top song and top album in the same year":
-        //   songAndAlbumSearch();
-        //   break;
         });
       });
   }
 
+  // I don't have error handling for if the item they select exists
+  // I also don't have error handling for when the quantity they select is 0
