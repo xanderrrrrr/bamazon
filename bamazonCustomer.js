@@ -63,11 +63,14 @@ function runSearch() {
         ])
       .then(function(answer) {
           // setting the sql query based on the answers above
-        var query = "SELECT stock_quantity,price  FROM products WHERE item_id = ?";
+        var query = "SELECT stock_quantity,price,product_sales  FROM products WHERE item_id = ?";
         connection.query(query, [answer.whatID], function(err, res) {
 
             // this is the stock quantity that the db has before any transaction is made
             var stock_quantity = res[0].stock_quantity;
+
+            // this is the current product_sales that the db has before any transaction is made
+            var cur_sales = res[0].product_sales;
 
             // this is what we will set as the new quantity after the transaction
             var new_db_quantity = stock_quantity - answer.whatQuantity
@@ -76,12 +79,14 @@ function runSearch() {
             if (answer.whatQuantity <= stock_quantity) {
 
                 // math for total cost goes here
-                var price_math = res[0].price * answer.whatQuantity
+                var price_math = res[0].price * answer.whatQuantity;
+                // adding the transaction cost + previous product_sales
+                var new_sales_total = cur_sales + price_math;
                 console.log("We have enough quantity! \n")
 
-                // setting our database with the new subtracted quantity
+                // setting our database with the new subtracted quantity (and setting the price of total sales in the )
                 var query = "UPDATE products SET stock_quantity = ?, product_sales = ? WHERE item_id = ?"
-                connection.query(query, [new_db_quantity, price_math, answer.whatID], function(err, res) {
+                connection.query(query, [new_db_quantity, new_sales_total, answer.whatID], function(err, res) {
                     console.log("Updating database...\n")
 
                     // returning to the user what we have left and what they paid
