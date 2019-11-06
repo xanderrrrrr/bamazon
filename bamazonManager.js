@@ -42,10 +42,6 @@ function initialPrompt() {
             case "View Products for Sale":
                 viewProducts();
                 break;
-            
-            case "View Products for Sale":
-                //function 
-                break;
 
             case "View Low Inventory":
                 viewLowInventory();
