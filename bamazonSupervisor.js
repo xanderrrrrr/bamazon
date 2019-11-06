@@ -33,7 +33,7 @@ function initialPrompt() {
               break;
       
             case "Create New Department":
-                // function
+                newDepartment();
               break;
             
             case "Exit":
@@ -44,7 +44,8 @@ function initialPrompt() {
 }
 
 function viewSales() {
-    connection.query("SELECT prod.department_name, SUM(prod.product_sales) as product_sales, dept.overhead_costs as overhead_costs, SUM(prod.product_sales) - dept.overhead_costs as total_profit FROM products prod INNER JOIN departments dept ON prod.department_name = dept.department_name GROUP BY department_name, overhead_costs;", function (err, res) {
+    var query = "SELECT prod.department_name, SUM(prod.product_sales) as product_sales, dept.overhead_costs as overhead_costs, SUM(prod.product_sales) - dept.overhead_costs as total_profit FROM products prod INNER JOIN departments dept ON prod.department_name = dept.department_name GROUP BY department_name, overhead_costs;"
+    connection.query(query, function (err, res) {
         if (err) throw err;
         var table = new Table({
             head: ['department_name', 'product_sales', 'overhead_costs', 'total_profit']
@@ -59,9 +60,29 @@ function viewSales() {
                     res[i].total_profit
                 ]);
         }
-
         console.log(table.toString());
         initialPrompt();
     })
 }
 
+function newDepartment() {
+    inquirer.prompt([
+        {
+            name: "department_name",
+            type: "input",
+            message: "What is the new department name? "
+        },
+        {
+            name: "overhead_costs",
+            type: "number",
+            message: "What is the overhead cost of the department? "
+        }
+    ]).then(function(answer) {
+        var query = "INSERT INTO departments (department_name, overhead_costs) VALUES (?,?);"
+        connection.query(query, [answer.department_name, answer.overhead_costs], function(err, res) {
+            if (err) throw err;
+            console.log("Successfully entered in the new department " + answer.department_name);
+            initialPrompt();
+        })
+    })
+}

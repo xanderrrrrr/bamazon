@@ -29,7 +29,7 @@ function initialPrompt() {
         {
             name: "action",
             type: "list",
-            message: "what would you like to do?",
+            message: "What would you like to do?",
             choices: [
                 "View Products for Sale",
                 "View Low Inventory",
@@ -93,6 +93,14 @@ function viewLowInventory() {
 
 // function that prompts the user for what new item to add to the db
 function addNewProduct() {
+    departmentArr = [];
+    var query = "SELECT department_name FROM departments GROUP BY department_name HAVING COUNT(*)>0 ORDER BY department_name;";
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            departmentArr.push(res[i].department_name);
+        }
+    })
     inquirer.prompt([
         {
             name: "productName",
@@ -103,12 +111,7 @@ function addNewProduct() {
             name: "departmentName",
             type: "list",
             message: "What department should this go in?",
-            choices: [
-                "Home & Kitchen",
-                "Electronics",
-                "Fashion",
-                "Grocery"
-                ]
+            choices: departmentArr
         },
         {
             name: "productPrice",
