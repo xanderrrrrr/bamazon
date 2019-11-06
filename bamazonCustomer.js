@@ -36,7 +36,7 @@ function initialPrompt() {
     .then(function(actionAnswer) {
         switch (actionAnswer.action) {
             case "Buy an item":
-              runSearch();
+                addProductsToArray();
               break;
       
             case "Exit":
@@ -46,14 +46,33 @@ function initialPrompt() {
     });
 }
 
+// this function will add products to an array of choices
+// doing it this way becuase I need the array of choices to exist before inquirer.prompt'ing the user
+function addProductsToArray() {
+    productArray = [];
+    var query = "SELECT product_name FROM products ;";
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        // pushing into the array to be used in the options below
+        for (var i = 0; i < res.length; i++) {
+            productArray.push(res[i].product_name);
+        }
+        // invoking the function to prompt users 
+        buyProduct(productArray);
+    })
+}
+
 // function that will prompt the user and update our db if necessary
-function runSearch() {
+// passing through our product array for our choices of what they'd like to buy from the above function
+function buyProduct(productArray) {
+
     inquirer
       .prompt([
       {
         name: "whatID",
-        type: "number",
-        message: "What is the ID of the product that you'd like to buy? ",
+        type: "list",
+        message: "Which item would you like to buy? ",
+        choices: productArray
       },
       {
           name: "whatQuantity",
@@ -63,7 +82,7 @@ function runSearch() {
         ])
       .then(function(answer) {
           // setting the sql query based on the answers above
-        var query = "SELECT stock_quantity,price,product_sales  FROM products WHERE item_id = ?";
+        var query = "SELECT stock_quantity,price,product_sales FROM products WHERE product_name = ?";
         connection.query(query, [answer.whatID], function(err, res) {
 
             // this is the stock quantity that the db has before any transaction is made
@@ -103,5 +122,4 @@ function runSearch() {
       });
   }
 
-  // I don't have error handling for if the item they select exists (e.g. if they select item 0 or item 10000)
-  // I also don't have error handling for when the quantity they select is 0 or negative number or a number at all....
+  // I aso don't have error handling for when the quantity they select is 0 or negative number or a number at all....
