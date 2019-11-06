@@ -15,7 +15,6 @@ var connection = mysql.createConnection({
 // connecting to the database and running the function that will prompt the users
 connection.connect(function(err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId);
     // run the prompt function
     initialPrompt();
 });
@@ -50,8 +49,22 @@ function viewSales() {
         var table = new Table({
             head: ['department_name', 'product_sales', 'overhead_costs', 'total_profit']
         });
-
+        
         for (let i = 0; i < res.length; i++) {
+            
+            var dept_name = res[i].department_name
+            var product_sales = res[i].product_sales
+            var overhead_costs = res[i].overhead_costs
+            var total_profit = res[i].total_profit
+            // I needed to push 0 when these were null because the table needs 4 items per row, and null is not an item
+            if (product_sales === null || total_profit === null) {
+                table.push([
+                    dept_name,
+                    0,
+                    overhead_costs,
+                    0
+                ])
+            } else {
             table.push(
                 [
                     res[i].department_name,
@@ -59,6 +72,7 @@ function viewSales() {
                     res[i].overhead_costs,
                     res[i].total_profit
                 ]);
+            }
         }
         console.log(table.toString());
         initialPrompt();

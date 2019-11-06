@@ -82,7 +82,7 @@ function buyProduct(productArray) {
         ])
       .then(function(answer) {
           // setting the sql query based on the answers above
-        var query = "SELECT stock_quantity,price,product_sales FROM products WHERE product_name = ?";
+        var query = "SELECT stock_quantity,price,product_sales FROM products WHERE product_name LIKE ?";
         connection.query(query, [answer.whatID], function(err, res) {
 
             // this is the stock quantity that the db has before any transaction is made
@@ -104,7 +104,7 @@ function buyProduct(productArray) {
                 console.log("We have enough quantity! \n")
 
                 // setting our database with the new subtracted quantity (and setting the price of total sales in the )
-                var query = "UPDATE products SET stock_quantity = ?, product_sales = ? WHERE item_id = ?"
+                var query = "UPDATE products SET stock_quantity = ?, product_sales = ? WHERE product_name LIKE ?"
                 connection.query(query, [new_db_quantity, new_sales_total, answer.whatID], function(err, res) {
                     console.log("Updating database...\n")
 
