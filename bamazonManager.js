@@ -124,7 +124,7 @@ function addNewProduct() {
         var query = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES (?,?,?,?);"
         connection.query(query, [answer.productName, answer.departmentName, answer.productPrice, answer.productQuantity], function(err, res) {
             if (err) throw err;
-            console.log("successfully entered the product! \n");
+            console.log("Successfully entered the product! \n");
             initialPrompt();
         })
 
@@ -178,7 +178,7 @@ function updateQuantity(whichItem, new_quantity) {
             var query = "UPDATE products SET stock_quantity = ? WHERE product_name = ?;"
         connection.query(query, [new_quantity, whichItem], function(err, res) {
             if (err) throw err;
-            console.log("successfully entered the product! \n We now have " + new_quantity + " " + whichItem + "(s)");
+            console.log("Successfully entered the product! \n We now have " + new_quantity + " " + whichItem + "(s)\n");
             initialPrompt();
         })
 }
