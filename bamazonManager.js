@@ -9,6 +9,7 @@ var connection = mysql.createConnection({
   user: "root",
   password: "password",
   database: "bamazon",
+  // these below are for my decimals to show up when console logging results from the db
   supportBigNumbers: true,
   bigNumberStrings: true,
 });
@@ -93,10 +94,12 @@ function viewLowInventory() {
 
 // function that prompts the user for what new item to add to the db
 function addNewProduct() {
+    // "dynamically" iterating through the department options from the `departments` table so it's not a static list
     departmentArr = [];
     var query = "SELECT department_name FROM departments GROUP BY department_name HAVING COUNT(*)>0 ORDER BY department_name;";
     connection.query(query, function(err, res) {
         if (err) throw err;
+        // pushing into the array to be used in the options below
         for (var i = 0; i < res.length; i++) {
             departmentArr.push(res[i].department_name);
         }
@@ -111,6 +114,9 @@ function addNewProduct() {
             name: "departmentName",
             type: "list",
             message: "What department should this go in?",
+            // using the dynamic options as choices
+            // I don't think I need to invoke functions like below for addToArray and addToInventory because there 
+            // is the above prompt before this one that allows for the query and array to fulfill 
             choices: departmentArr
         },
         {
@@ -136,6 +142,7 @@ function addNewProduct() {
 }
 
 // function that is called when "add to inventory" is selected so I have an array of choices for the user 
+// I did this because of asynchronicity and this way the arrays exist for sure before the first prompt
 function addToArray() {
     var productArray = [];
     var query = "SELECT product_name FROM products;";
@@ -168,6 +175,7 @@ function addToInventory(productArray) {
         var query = "SELECT stock_quantity FROM products WHERE ?"
         connection.query(query, {product_name: answer.whichItem}, function(err, res) {
             if (err) throw err;
+            // some math to add the existing stock from the above SELECT query with how many they want to add
             var new_quantity = res[0].stock_quantity + answer.howMany;
             var whichItem = answer.whichItem;
             // invoking a function that will actually update the db with the user's choices (passing the choices thru)
