@@ -39,6 +39,7 @@ function initialPrompt() {
             ]
         }
     )
+    // switch case handling the logic of which functions should be invoked
     .then(function(actionAnswer) {
         switch (actionAnswer.action) {
             case "View Products for Sale":
@@ -50,7 +51,7 @@ function initialPrompt() {
                 break;
 
             case "Add to Inventory":
-                // function
+                addToArray();
                 break;
 
             case "Add New Product":
@@ -64,6 +65,7 @@ function initialPrompt() {
     });
 }
 
+// function that queries the db to show all the items
 function viewProducts() {
     var query = "SELECT item_id, product_name, price, stock_quantity FROM products;";
     connection.query(query, function(err, res) {
@@ -71,10 +73,13 @@ function viewProducts() {
         console.log("Item ID: " + res[i].item_id + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price);
         }
     console.log("\n")
+
+    // re-prompts the user for next action
     initialPrompt();
     });
 }
 
+// function that shows the user all items with less than 5 inventory
 function viewLowInventory() {
     var query = "SELECT item_id, product_name, price, stock_quantity FROM products WHERE stock_quantity < 5;"
     connection.query(query, function(err, res) {
@@ -86,6 +91,7 @@ function viewLowInventory() {
     })
 }
 
+// function that prompts the user for what new item to add to the db
 function addNewProduct() {
     inquirer.prompt([
         {
@@ -112,13 +118,13 @@ function addNewProduct() {
         {
             name: "productQuantity",
             type: "number",
-            message: "How many of the product do wew have? "
+            message: "How many of the product do we have? "
         }]
     ).then(function(answer) {
         var query = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES (?,?,?,?);"
         connection.query(query, [answer.productName, answer.departmentName, answer.productPrice, answer.productQuantity], function(err, res) {
             if (err) throw err;
-            console.log("successfully entered the product!");
+            console.log("successfully entered the product! \n");
             initialPrompt();
         })
 
@@ -126,3 +132,53 @@ function addNewProduct() {
 
 }
 
+// function that is called when "add to inventory" is selected so I have an array of choices for the user 
+function addToArray() {
+    var productArray = [];
+    var query = "SELECT product_name FROM products;";
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            productArray.push(res[i].product_name);
+        }
+        // invoking the function that will prompt the user for choices (passing through the choices)
+        addToInventory(productArray)
+    });
+    
+}
+
+// function that prompts the user which item from choices they want to update
+function addToInventory(productArray) {
+    inquirer.prompt([
+        {
+            name: "whichItem",
+            type: "rawlist",
+            message: "Which item would you like to add more of? ",
+            choices: productArray
+        },
+        {
+            name: "howMany",
+            type: "number",
+            message: "How many of the product are we adding? "
+        }
+    ]).then(function(answer) {
+        var query = "SELECT stock_quantity FROM products WHERE ?"
+        connection.query(query, {product_name: answer.whichItem}, function(err, res) {
+            if (err) throw err;
+            var new_quantity = res[0].stock_quantity + answer.howMany;
+            var whichItem = answer.whichItem;
+            // invoking a function that will actually update the db with the user's choices (passing the choices thru)
+            updateQuantity(whichItem, new_quantity);
+        })
+    })
+}
+
+// function that actually updates the db with the user's choices
+function updateQuantity(whichItem, new_quantity) {
+            var query = "UPDATE products SET stock_quantity = ? WHERE product_name = ?;"
+        connection.query(query, [new_quantity, whichItem], function(err, res) {
+            if (err) throw err;
+            console.log("successfully entered the product! \n We now have " + new_quantity + " " + whichItem + "(s)");
+            initialPrompt();
+        })
+}
