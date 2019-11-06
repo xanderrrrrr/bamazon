@@ -8,7 +8,9 @@ var connection = mysql.createConnection({
   port: 3306,
   user: "root",
   password: "password",
-  database: "bamazon"
+  database: "bamazon",
+  supportBigNumbers: true,
+  bigNumberStrings: true,
 });
 
 // connecting to the database and running the function that will prompt the users
