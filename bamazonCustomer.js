@@ -80,8 +80,8 @@ function runSearch() {
                 console.log("We have enough quantity! \n")
 
                 // setting our database with the new subtracted quantity
-                var query = "UPDATE products SET stock_quantity = ? WHERE item_id = ?"
-                connection.query(query, [new_db_quantity, answer.whatID], function(err, res) {
+                var query = "UPDATE products SET stock_quantity = ?, product_sales = ? WHERE item_id = ?"
+                connection.query(query, [new_db_quantity, price_math, answer.whatID], function(err, res) {
                     console.log("Updating database...\n")
 
                     // returning to the user what we have left and what they paid
