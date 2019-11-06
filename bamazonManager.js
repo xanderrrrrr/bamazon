@@ -50,11 +50,11 @@ function initialPrompt() {
                 break;
 
             case "Add to Inventory":
-                addToInventory();
+                // function
                 break;
 
             case "Add New Product":
-                //function
+                addNewProduct();
                 break;
       
             case "Exit":
@@ -86,7 +86,7 @@ function viewLowInventory() {
     })
 }
 
-function addToInventory() {
+function addNewProduct() {
     inquirer.prompt([
         {
             name: "productName",
