@@ -48,7 +48,7 @@ function initialPrompt() {
                 break;
 
             case "Add to Inventory":
-                //function
+                addToInventory();
                 break;
 
             case "Add New Product":
@@ -83,3 +83,44 @@ function viewLowInventory() {
     initialPrompt();
     })
 }
+
+function addToInventory() {
+    inquirer.prompt([
+        {
+            name: "productName",
+            type: "input",
+            message: "What is the name of the product? "
+        },
+        {
+            name: "departmentName",
+            type: "list",
+            message: "What department should this go in?",
+            choices: [
+                "Home & Kitchen",
+                "Electronics",
+                "Fashion",
+                "Grocery"
+                ]
+        },
+        {
+            name: "productPrice",
+            type: "number",
+            message: "What is the product's price? "
+        },
+        {
+            name: "productQuantity",
+            type: "number",
+            message: "How many of the product do wew have? "
+        }]
+    ).then(function(answer) {
+        var query = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES (?,?,?,?);"
+        connection.query(query, [answer.productName, answer.departmentName, answer.productPrice, answer.productQuantity], function(err, res) {
+            if (err) throw err;
+            console.log("successfully entered the product!");
+            initialPrompt();
+        })
+
+    })
+
+}
+
