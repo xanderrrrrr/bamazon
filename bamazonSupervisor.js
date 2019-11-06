@@ -1,6 +1,7 @@
 // setting my required dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var {table} = require("table")
 
 // setting up the sql connection
 var connection = mysql.createConnection({
@@ -28,7 +29,7 @@ function initialPrompt() {
     .then(function(actionAnswer) {
         switch (actionAnswer.action) {
             case "View Product Sales by Department":
-              // function
+              viewSales();
               break;
       
             case "Create New Department":
@@ -41,3 +42,25 @@ function initialPrompt() {
         }
     });
 }
+
+function viewSales() {
+    let config,data,output;
+ 
+    data = [
+    ['Department ID', 'Department Name', 'Overhead Costs', "Product Sales", "Total Profit"],
+    ['1A', '1B', '1C', '1d', '1e']
+    ];
+ 
+    var query = "SELECT department_id,department_name,overhead_costs FROM departments;";
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        console.log(res)
+
+    })
+
+
+    output = table(data, config);
+    
+    console.log(output);
+}
+
