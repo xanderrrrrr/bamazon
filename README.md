@@ -23,11 +23,13 @@ I wrote the entire thing in javascript for the "front-end", powered by mySQL dat
 1. This assumes familiarity with SQL, so once you get mySQL up and running you can use the `sql_seeding.sql` file to inject dummy data
 
 2. Edit the `.js` files with your connection config such as port, username, and password:
-`  host: "localhost",
+```
+  host: "localhost",
   port: 3306,
   user: "root",
   password: "password",
-  database: "bamazon"`
+  database: "bamazon"
+```
 
 3. Iinstall the node packages outlined in `package.json` with the following command in the root folder:
 `npm install` 
